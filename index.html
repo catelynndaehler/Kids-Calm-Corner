@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kids Calm Corner - Interactive Coping Skills</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Fredoka & Quicksand -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        skySoft: '#E0F2FE',
+                        mintSoft: '#D1FAE5',
+                        purpleSoft: '#F3E8FF',
+                        yellowSoft: '#FEF3C7',
+                        pinkSoft: '#FCE7F3',
+                        coralSoft: '#FFEDD5',
+                        calmNavy: '#1E293B'
+                    },
+                    fontFamily: {
+                        fredoka: ['Fredoka', 'sans-serif'],
+                        quicksand: ['Quicksand', 'sans-serif'],
+                    },
+                    borderRadius: {
+                        '3xl': '1.75rem',
+                        '4xl': '2.25rem',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: linear-gradient(135deg, #e0f2fe 0%, #f3e8ff 50%, #fce7f3 100%);
+            min-height: 100vh;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        h1, h2, h3, .font-heading {
+            font-family: 'Fredoka', cursive;
+        }
+
+        .bouncy-hover {
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+        }
+        .bouncy-hover:hover {
+            transform: scale(1.05) translateY(-2px);
+        }
+        .bouncy-hover:active {
+            transform: scale(0.95) translateY(0);
+        }
+
+        /* Card Flip 3D Container */
+        .flip-card {
+            perspective: 1000px;
+        }
+        .flip-card-inner {
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+
+        /* Custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="text-slate-800 flex flex-col min-h-screen relative overflow-x-hidden">
+
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-40 border-b border-purple-100 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+            <!-- Logo -->
+            <div onclick="switchTab('breathing')" class="flex items-center gap-3 cursor-pointer group">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-pink-400 via-purple-400 to-indigo-400 flex items-center justify-center text-white text-2xl shadow-md group-hover:rotate-6 transition-transform">
+                    🌈
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+                        Calm Corner
+                    </h1>
+                    <p class="text-xs font-semibold text-purple-400">Your Safe Space to Relax</p>
+                </div>
+            </div>
+
+            <!-- Top Right Audio Toggle & Stars Badge -->
+            <div class="flex items-center gap-3">
+                <!-- Audio Synth Toggle -->
+                <button id="soundToggleBtn" onclick="toggleSound()" class="bg-amber-100 hover:bg-amber-200 text-amber-700 px-3.5 py-2 rounded-full text-sm font-semibold flex items-center gap-2 transition border border-amber-200">
+                    <i id="soundIcon" class="fas fa-volume-up"></i>
+                    <span id="soundText" class="hidden sm:inline">Sound On</span>
+                </button>
+
+                <!-- Stars Counter Badge -->
+                <div class="bg-yellow-100 border border-yellow-300 text-yellow-800 px-4 py-2 rounded-full font-bold flex items-center gap-2 text-sm shadow-sm">
+                    <span class="text-lg animate-bounce">⭐</span>
+                    <span id="starCount">0</span> Stars
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 py-6 flex-grow w-full">
+
+        <!-- VISUAL EMOTION SELECTOR -->
+        <section id="moodSection" class="bg-white/90 backdrop-blur-md rounded-3xl p-6 shadow-xl mb-8 border border-white/60">
+            <div class="text-center mb-4">
+                <h2 class="text-2xl font-bold text-slate-700">How are you feeling right now?</h2>
+                <p class="text-slate-500 text-sm">Tap an emoji to find the best calming activity for you!</p>
+            </div>
+
+            <div class="grid grid-cols-4 sm:grid-cols-7 gap-3">
+                <button onclick="selectMood('happy', '😊', 'Happy', 'Yay! Spread the positivity or try the Rainbow Pop-It!')" class="mood-btn flex flex-col items-center p-3 rounded-2xl bg-amber-50 hover:bg-amber-100 border-2 border-amber-200 bouncy-hover">
+                    <span class="text-4xl mb-1">😊</span>
+                    <span class="text-xs font-bold text-amber-800">Happy</span>
+                </button>
+                <button onclick="selectMood('anxious', '😰', 'Anxious', 'Feeling worried? Deep breathing or pop-it can help gently calm your body.')" class="mood-btn flex flex-col items-center p-3 rounded-2xl bg-blue-50 hover:bg-blue-100 border-2 border-blue-200 bouncy-hover">
+                    <span class="text-4xl mb-1">😰</span>
+                    <span class="text-xs font-bold text-blue-800">Anxious</span>
+                </button>
+                <button onclick="selectMood('angry', '😡', 'Angry', 'Big angry feelings? Feed your frustration to the Worry Monster!')" class="mood-btn flex flex-col items-center p-3 rounded-2xl bg-red-50 hover:bg-red-100 border-2 border-red-200 bouncy-hover">
+                    <span class="text-4xl mb-1">😡</span>
+                    <span class="text-xs font-bold text-red-800">Angry</span>
+                </button>
+                <button onclick="selectMood('sad', '😢', 'Sad', 'It\'s okay to feel sad. Let\'s draw a Power Card or swirl the glitter jar.')" class="mood-btn flex flex-col items-center p-3 rounded-2xl bg-indigo-50 hover:bg-indigo-100 border-2 border-indigo-200 bouncy-hover">
+                    <span class="text-4xl mb-1">😢</span>
+                    <span class="text-xs font-bold text-indigo-800">Sad</span>
+                </button>
+                <button onclick="selectMood('overwhelmed', '🤯', 'Overwhelmed', 'Too much noise or thoughts? Try the 5-4-3-2-1 Grounding Safari!')" class="mood-btn flex flex-col items-center p-3 rounded-2xl bg-purple-50 hover:bg-purple-100 border-2 border-purple-200 bouncy-hover">
+                    <span class="text-4xl mb-1">🤯</span>
+                    <span class="text-xs font-bold text-purple-800">Overwhelmed</span>
+                </button>
+                <button onclick="selectMood('tired', '😴', 'Tired', 'Rest up! Soft balloon breathing will soothe your mind.')" class="mood-btn flex flex-col items-center p-3 rounded-2xl bg-teal-50 hover:bg-teal-100 border-2 border-teal-200 bouncy-hover">
+                    <span class="text-4xl mb-1">😴</span>
+                    <span class="text-xs font-bold text-teal-800">Tired</span>
+                </button>
+                <button onclick="selectMood('silly', '🤪', 'Silly', 'Full of extra energy? Pop all 36 bubbles on the Pop-It!')" class="mood-btn flex flex-col items-center p-3 rounded-2xl bg-pink-50 hover:bg-pink-100 border-2 border-pink-200 bouncy-hover">
+                    <span class="text-4xl mb-1">🤪</span>
+                    <span class="text-xs font-bold text-pink-800">Silly</span>
+                </button>
+            </div>
+
+            <!-- Mood Feedback Message Banner -->
+            <div id="moodFeedback" class="hidden mt-4 p-4 rounded-2xl bg-gradient-to-r from-purple-100 to-pink-100 border border-purple-200 text-center animate-fade-in">
+                <span id="moodEmoji" class="text-3xl mr-2"></span>
+                <span id="moodMessage" class="font-bold text-purple-900 text-base"></span>
+            </div>
+        </section>
+
+        <div class="flex flex-wrap gap-2 justify-center mb-6">
+            <button onclick="switchTab('breathing')" id="tab-breathing" class="nav-tab px-4 py-2.5 rounded-2xl font-bold text-sm bg-purple-500 text-white shadow-md transition border border-slate-200">
+                💨 Breathing Buddy
+            </button>
+            <button onclick="switchTab('grounding')" id="tab-grounding" class="nav-tab px-4 py-2.5 rounded-2xl font-bold text-sm bg-white text-slate-600 shadow-sm hover:bg-purple-50 transition border border-slate-200">
+                🖐️ Grounding Safari
+            </button>
+            <button onclick="switchTab('monster')" id="tab-monster" class="nav-tab px-4 py-2.5 rounded-2xl font-bold text-sm bg-white text-slate-600 shadow-sm hover:bg-purple-50 transition border border-slate-200">
+                👾 Worry Monster
+            </button>
+            <button onclick="switchTab('popit')" id="tab-popit" class="nav-tab px-4 py-2.5 rounded-2xl font-bold text-sm bg-white text-slate-600 shadow-sm hover:bg-purple-50 transition border border-slate-200">
+                🔴 Rainbow Pop-It
+            </button>
+            <button onclick="switchTab('cards')" id="tab-cards" class="nav-tab px-4 py-2.5 rounded-2xl font-bold text-sm bg-white text-slate-600 shadow-sm hover:bg-purple-50 transition border border-slate-200">
+                ✨ Power Cards
+            </button>
+            <button onclick="switchTab('glitter')" id="tab-glitter" class="nav-tab px-4 py-2.5 rounded-2xl font-bold text-sm bg-white text-slate-600 shadow-sm hover:bg-purple-50 transition border border-slate-200">
+                ✨ Glitter Jar
+            </button>
+        </div>
+
+        <section id="sec-breathing" class="tab-content bg-white/90 backdrop-blur-md rounded-3xl p-6 sm:p-8 shadow-xl border border-white/60">
+            <div class="text-center max-w-lg mx-auto">
+                <span class="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-700 font-bold text-xs mb-2">CALM BODY & MIND</span>
+                <h2 class="text-3xl font-bold text-slate-800 mb-2">Deep Breathing Buddy</h2>
+                <p class="text-slate-600 text-sm mb-6">Breathe in slowly as the bubble grows, hold softly, and gently blow out your worry as it shrinks.</p>
+
+                <!-- Breathing Mode Switcher -->
+                <div class="flex justify-center gap-3 mb-6">
+                    <button onclick="setBreathingMode('box')" id="btn-mode-box" class="px-4 py-2 rounded-xl text-xs font-bold bg-blue-500 text-white shadow-sm">4-4-4 Box Breath</button>
+                    <button onclick="setBreathingMode('balloon')" id="btn-mode-balloon" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">4-7-8 Balloon Breath</button>
+                </div>
+
+                <!-- Animated Bubble Circle -->
+                <div class="relative w-64 h-64 mx-auto flex items-center justify-center my-4">
+                    <div id="bubbleHalo" class="absolute w-full h-full rounded-full bg-sky-200/50 transition-all duration-1000 ease-in-out scale-75"></div>
+                    <div id="breathBubble" class="w-48 h-48 rounded-full bg-gradient-to-tr from-sky-400 via-teal-300 to-indigo-300 shadow-2xl flex flex-col items-center justify-center text-white font-bold transition-transform ease-in-out duration-[4000ms] scale-75 border-4 border-white/40">
+                        <span id="breathAction" class="text-2xl font-heading tracking-wide">Get Ready</span>
+                        <span id="breathTimer" class="text-4xl font-bold mt-1">3</span>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <div class="flex justify-center gap-4 mt-6">
+                    <button id="startBreathBtn" onclick="toggleBreathing()" class="bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white px-8 py-3 rounded-2xl font-bold shadow-lg bouncy-hover text-lg flex items-center gap-2">
+                        <i class="fas fa-play"></i> Start Breathing
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="sec-grounding" class="tab-content hidden bg-white/90 backdrop-blur-md rounded-3xl p-6 sm:p-8 shadow-xl border border-white/60">
+            <div class="max-w-2xl mx-auto text-center">
+                <span class="inline-block px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 font-bold text-xs mb-2">5-4-3-2-1 SENSES</span>
+                <h2 class="text-3xl font-bold text-slate-800 mb-2">Grounding Safari</h2>
+                <p class="text-slate-600 text-sm mb-6">Look around your room and tap items as you notice them to bring your mind back to the present!</p>
+
+                <!-- Grounding Step Navigation Pills -->
+                <div class="flex justify-between items-center gap-1 sm:gap-2 mb-8 bg-slate-100 p-2 rounded-2xl">
+                    <div id="g-step-5" class="g-step-pill flex-1 py-2 rounded-xl text-xs sm:text-sm font-bold bg-emerald-500 text-white shadow-sm text-center">5 Sight</div>
+                    <div id="g-step-4" class="g-step-pill flex-1 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white text-slate-500 text-center">4 Touch</div>
+                    <div id="g-step-3" class="g-step-pill flex-1 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white text-slate-500 text-center">3 Sound</div>
+                    <div id="g-step-2" class="g-step-pill flex-1 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white text-slate-500 text-center">2 Smell</div>
+                    <div id="g-step-1" class="g-step-pill flex-1 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white text-slate-500 text-center">1 Heart</div>
+                </div>
+
+                <!-- Grounding Step Area -->
+                <div id="groundingStepCard" class="bg-gradient-to-br from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-3xl p-6 sm:p-8 shadow-sm">
+                    <div id="groundingPromptHeader" class="text-xl font-bold text-emerald-900 mb-2">
+                        👀 Find 5 things you can SEE around you!
+                    </div>
+                    <p class="text-slate-600 text-xs sm:text-sm mb-6">Tap the badges below each time you spot something:</p>
+
+                    <div id="groundingItemGrid" class="flex flex-wrap justify-center gap-3 mb-6">
+                        <!-- Populated dynamically in JavaScript -->
+                    </div>
+
+                    <div id="groundingProgressText" class="text-xs font-bold text-emerald-700">0 of 5 found</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="sec-monster" class="tab-content hidden bg-white/90 backdrop-blur-md rounded-3xl p-6 sm:p-8 shadow-xl border border-white/60">
+            <div class="max-w-xl mx-auto text-center">
+                <span class="inline-block px-3 py-1 rounded-full bg-purple-100 text-purple-700 font-bold text-xs mb-2">LET IT GO</span>
+                <h2 class="text-3xl font-bold text-slate-800 mb-2">Feed the Worry Monster</h2>
+                <p class="text-slate-600 text-sm mb-6">Type or draw anything bothering you. Barnaby the Worry Monster loves eating worries so you don't have to carry them!</p>
+
+                <!-- Interactive Monster Visual -->
+                <div class="relative w-40 h-40 mx-auto mb-4 flex items-center justify-center">
+                    <div id="monsterAvatar" class="text-8xl transition-transform duration-300 hover:scale-110 cursor-pointer" onclick="feedMonsterAnimation()">
+                        👾
+                    </div>
+                </div>
+
+                <!-- Mode Switcher: Type vs Canvas Draw -->
+                <div class="flex justify-center gap-3 mb-4">
+                    <button onclick="setMonsterMode('type')" id="btn-m-type" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-purple-500 text-white shadow-sm">Type Worry</button>
+                    <button onclick="setMonsterMode('draw')" id="btn-m-draw" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">Draw Worry</button>
+                </div>
+
+                <!-- Worry Input Box (Type Mode) -->
+                <div id="worryTypeContainer" class="space-y-4">
+                    <textarea id="worryText" rows="3" placeholder="What's bothering you? (e.g., 'I feel nervous about tomorrow...')" class="w-full p-4 rounded-2xl border-2 border-purple-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none text-slate-700 font-medium resize-none shadow-inner"></textarea>
+                </div>
+
+                <!-- Worry Canvas Container (Draw Mode) -->
+                <div id="worryDrawContainer" class="hidden mb-4">
+                    <div class="border-2 border-purple-200 rounded-2xl bg-white overflow-hidden shadow-inner">
+                        <canvas id="worryCanvas" width="350" height="180" class="w-full cursor-crosshair touch-none"></canvas>
+                    </div>
+                    <button onclick="clearMonsterCanvas()" class="mt-2 text-xs font-bold text-purple-600 hover:underline">Clear Drawing</button>
+                </div>
+
+                <button onclick="feedMonster()" class="mt-4 w-full bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-bold py-3.5 rounded-2xl shadow-lg bouncy-hover flex items-center justify-center gap-2 text-lg">
+                    <span>Nom Nom! Feed Worry to Monster</span> 🚀
+                </button>
+
+                <!-- Munching Animation Result -->
+                <div id="monsterFedMessage" class="hidden mt-4 p-4 bg-purple-50 rounded-2xl border border-purple-200 text-purple-900 font-bold animate-bounce">
+                    🎉 Gulp! Worry eaten and gone forever! You are safe and doing great!
+                </div>
+            </div>
+        </section>
+
+        <section id="sec-popit" class="tab-content hidden bg-white/90 backdrop-blur-md rounded-3xl p-6 sm:p-8 shadow-xl border border-white/60">
+            <div class="max-w-md mx-auto text-center">
+                <span class="inline-block px-3 py-1 rounded-full bg-pink-100 text-pink-700 font-bold text-xs mb-2">SENSORY FIDGET</span>
+                <h2 class="text-3xl font-bold text-slate-800 mb-2">Rainbow Pop-It Toy</h2>
+                <p class="text-slate-600 text-sm mb-6">Tap all the colorful bubbles to pop them and hear the satisfying pops!</p>
+
+                <!-- Pop-It Board -->
+                <div class="bg-gradient-to-b from-pink-300 via-purple-300 to-sky-300 p-5 rounded-3xl shadow-inner border-4 border-white/80">
+                    <div id="popitGrid" class="grid grid-cols-6 gap-3">
+                        <!-- 36 Pop-it bubbles generated dynamically in JavaScript -->
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-between items-center">
+                    <span id="poppedCounter" class="text-sm font-bold text-slate-600">Popped: 0 / 36</span>
+                    <button onclick="resetPopit()" class="px-4 py-2 bg-pink-500 hover:bg-pink-600 text-white text-xs font-bold rounded-xl shadow-md transition">
+                        <i class="fas fa-rotate-left mr-1"></i> Reset Board
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="sec-cards" class="tab-content hidden bg-white/90 backdrop-blur-md rounded-3xl p-6 sm:p-8 shadow-xl border border-white/60">
+            <div class="max-w-md mx-auto text-center">
+                <span class="inline-block px-3 py-1 rounded-full bg-amber-100 text-amber-700 font-bold text-xs mb-2">BOOST YOUR BRAVE</span>
+                <h2 class="text-3xl font-bold text-slate-800 mb-2">Power Affirmation Cards</h2>
+                <p class="text-slate-600 text-sm mb-6">Tap the card to flip it and reveal your secret superpower statement!</p>
+
+                <!-- 3D Flip Card Container -->
+                <div id="affirmationFlipCard" onclick="flipAffirmationCard()" class="flip-card w-full h-64 cursor-pointer my-4">
+                    <div class="flip-card-inner relative w-full h-full rounded-3xl shadow-xl transition-transform duration-700">
+                        <!-- FRONT SIDE -->
+                        <div class="flip-card-front absolute inset-0 bg-gradient-to-br from-amber-300 via-orange-300 to-pink-300 rounded-3xl p-6 flex flex-col items-center justify-center border-4 border-white text-white">
+                            <span class="text-6xl mb-2 animate-pulse">✨</span>
+                            <span class="text-2xl font-bold font-heading">Tap to Reveal Your Secret Strength!</span>
+                        </div>
+                        <!-- BACK SIDE -->
+                        <div class="flip-card-back absolute inset-0 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-3xl p-6 flex flex-col items-center justify-center border-4 border-white text-white text-center">
+                            <span id="cardEmoji" class="text-5xl mb-2">🛡️</span>
+                            <p id="cardText" class="text-xl sm:text-2xl font-bold font-heading leading-snug px-2">"I am safe and everything is okay right now."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-center gap-3 mt-4">
+                    <button onclick="speakAffirmation()" class="bg-purple-100 hover:bg-purple-200 text-purple-700 font-bold px-5 py-3 rounded-2xl shadow-sm text-sm border border-purple-300 flex items-center gap-2">
+                        <i class="fas fa-volume-up"></i> Read Aloud
+                    </button>
+                    <button onclick="nextAffirmationCard()" class="bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white font-bold px-6 py-3 rounded-2xl shadow-md bouncy-hover flex items-center gap-2">
+                        <span>Next Card</span> <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="sec-glitter" class="tab-content hidden bg-white/90 backdrop-blur-md rounded-3xl p-6 sm:p-8 shadow-xl border border-white/60">
+            <div class="max-w-xl mx-auto text-center">
+                <span class="inline-block px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 font-bold text-xs mb-2">MINDFUL SANDBOX</span>
+                <h2 class="text-3xl font-bold text-slate-800 mb-2">Mindful Glitter Jar</h2>
+                <p class="text-slate-600 text-sm mb-4">Drag or swipe your finger across the jar to swirl sparkling colorful glitter!</p>
+
+                <div class="relative w-full h-80 bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border-4 border-slate-700">
+                    <canvas id="glitterCanvas" class="w-full h-full cursor-pointer touch-none"></canvas>
+                    <div class="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/50 backdrop-blur-md px-4 py-1.5 rounded-full text-white/80 text-xs font-semibold pointer-events-none">
+                        ✨ Drag or shake to swirl
+                    </div>
+                </div>
+
+                <button onclick="shakeGlitterJar()" class="mt-4 bg-indigo-500 hover:bg-indigo-600 text-white font-bold px-6 py-2.5 rounded-2xl shadow-md bouncy-hover text-sm inline-flex items-center gap-2">
+                    <i class="fas fa-hand-holding"></i> Shake Jar Up!
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="starModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-4xl p-8 max-w-sm w-full text-center shadow-2xl border-4 border-yellow-300">
+            <div class="text-6xl mb-3 animate-bounce">⭐</div>
+            <h3 class="text-3xl font-bold font-heading text-slate-800">Awesome Job!</h3>
+            <p class="text-slate-600 font-medium text-sm my-3">You completed a calming exercise and earned a Star Badge! Keep taking good care of your feelings.</p>
+            <button onclick="closeStarModal()" class="w-full bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-white font-bold py-3 rounded-2xl shadow-lg bouncy-hover mt-2">
+                Yay, Thank You!
+            </button>
+        </div>
+    </div>
+
+    <footer class="mt-auto py-6 text-center text-xs font-semibold text-slate-500">
+        <p>❤️ Created with care for kids to feel safe, calm, and confident outside of therapy.</p>
+    </footer>
+
+    <script>
+        /* State Variables */
+        let starCount = 0;
+        let soundEnabled = true;
+
+        /* Web Audio API Synthesizer (No external sound files required) */
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new AudioCtx();
+            }
+        }
+
+        function playTone(freq, type = 'sine', duration = 0.15, volume = 0.1) {
+            if (!soundEnabled) return;
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch(e) {}
+        }
+
+        function playPopSound() {
+            playTone(350 + Math.random() * 250, 'sine', 0.1, 0.15);
+        }
+
+        function playStarSound() {
+            if (!soundEnabled) return;
+            const notes = [523.25, 659.25, 783.99, 1046.50];
+            notes.forEach((freq, index) => {
+                setTimeout(() => playTone(freq, 'triangle', 0.2, 0.15), index * 100);
+            });
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const icon = document.getElementById('soundIcon');
+            const text = document.getElementById('soundText');
+            if (soundEnabled) {
+                icon.className = 'fas fa-volume-up';
+                text.innerText = 'Sound On';
+            } else {
+                icon.className = 'fas fa-volume-mute';
+                text.innerText = 'Muted';
+            }
+        }
+
+        function addStar() {
+            starCount += 1;
+            document.getElementById('starCount').innerText = starCount;
+            playStarSound();
+            document.getElementById('starModal').classList.remove('hidden');
+        }
+
+        function closeStarModal() {
+            document.getElementById('starModal').classList.add('hidden');
+        }
+
+        /* Tab Switcher */
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`sec-${tabId}`).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-tab').forEach(el => {
+                el.classList.remove('bg-purple-500', 'text-white', 'shadow-md');
+                el.classList.add('bg-white', 'text-slate-600');
+            });
+
+            const activeNav = document.getElementById(`tab-${tabId}`);
+            if(activeNav) {
+                activeNav.classList.remove('bg-white', 'text-slate-600');
+                activeNav.classList.add('bg-purple-500', 'text-white', 'shadow-md');
+            }
+
+            if(tabId === 'glitter') {
+                resizeGlitterCanvas();
+            }
+        }
+
+        /* Emotion Selector Handler */
+        function selectMood(moodKey, emoji, name, msg) {
+            const feedback = document.getElementById('moodFeedback');
+            document.getElementById('moodEmoji').innerText = emoji;
+            document.getElementById('moodMessage').innerText = msg;
+            feedback.classList.remove('hidden');
+            playTone(500, 'sine', 0.2);
+
+            setTimeout(() => {
+                if (moodKey === 'anxious' || moodKey === 'tired') switchTab('breathing');
+                else if (moodKey === 'angry') switchTab('monster');
+                else if (moodKey === 'overwhelmed') switchTab('grounding');
+                else if (moodKey === 'sad') switchTab('cards');
+                else if (moodKey === 'silly' || moodKey === 'happy') switchTab('popit');
+            }, 1200);
+        }
+
+        /* TOOL 1: Breathing Buddy Logic */
+        let breathingInterval = null;
+        let isBreathing = false;
+        let breathingMode = 'box';
+
+        function setBreathingMode(mode) {
+            breathingMode = mode;
+            document.getElementById('btn-mode-box').className = mode === 'box' ? 'px-4 py-2 rounded-xl text-xs font-bold bg-blue-500 text-white shadow-sm' : 'px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200';
+            document.getElementById('btn-mode-balloon').className = mode === 'balloon' ? 'px-4 py-2 rounded-xl text-xs font-bold bg-blue-500 text-white shadow-sm' : 'px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200';
+            if(isBreathing) toggleBreathing();
+        }
+
+        function toggleBreathing() {
+            const btn = document.getElementById('startBreathBtn');
+            const bubble = document.getElementById('breathBubble');
+            const halo = document.getElementById('bubbleHalo');
+            const actionText = document.getElementById('breathAction');
+            const timerText = document.getElementById('breathTimer');
+
+            if (isBreathing) {
+                clearInterval(breathingInterval);
+                isBreathing = false;
+                btn.innerHTML = '<i class="fas fa-play"></i> Start Breathing';
+                actionText.innerText = 'Get Ready';
+                timerText.innerText = '3';
+                bubble.style.transform = 'scale(0.75)';
+                halo.style.transform = 'scale(0.75)';
+                return;
+            }
+
+            isBreathing = true;
+            btn.innerHTML = '<i class="fas fa-pause"></i> Pause Guide';
+
+            let phase = 0; // 0: Inhale, 1: Hold, 2: Exhale
+            let secondsLeft = 4;
+
+            const runCycle = () => {
+                if (!isBreathing) return;
+
+                if (phase === 0) {
+                    actionText.innerText = 'Breathe In...';
+                    bubble.style.transitionDuration = '4000ms';
+                    halo.style.transitionDuration = '4000ms';
+                    bubble.style.transform = 'scale(1.2)';
+                    halo.style.transform = 'scale(1.4)';
+                    playTone(300, 'sine', 1.0);
+                } else if (phase === 1) {
+                    actionText.innerText = 'Hold Softly...';
+                    playTone(400, 'sine', 0.5);
+                } else if (phase === 2) {
+                    actionText.innerText = 'Breathe Out...';
+                    const duration = breathingMode === 'balloon' ? 8 : 4;
+                    bubble.style.transitionDuration = `${duration * 1000}ms`;
+                    halo.style.transitionDuration = `${duration * 1000}ms`;
+                    bubble.style.transform = 'scale(0.75)';
+                    halo.style.transform = 'scale(0.75)';
+                    playTone(250, 'sine', 1.0);
+                }
+
+                timerText.innerText = secondsLeft;
+
+                breathingInterval = setInterval(() => {
+                    secondsLeft -= 1;
+                    if (secondsLeft > 0) {
+                        timerText.innerText = secondsLeft;
+                    } else {
+                        clearInterval(breathingInterval);
+                        if (phase === 0) {
+                            phase = 1;
+                            secondsLeft = breathingMode === 'balloon' ? 7 : 4;
+                        } else if (phase === 1) {
+                            phase = 2;
+                            secondsLeft = breathingMode === 'balloon' ? 8 : 4;
+                        } else {
+                            phase = 0;
+                            secondsLeft = 4;
+                            addStar();
+                        }
+                        runCycle();
+                    }
+                }, 1000);
+            };
+
+            runCycle();
+        }
+
+        /* TOOL 2: Grounding Safari Logic */
+        const groundingData = [
+            { step: 5, title: "👀 Find 5 things you can SEE around you!", count: 5, items: ['🎨 Picture', '🧸 Toy', '🪟 Window', '📚 Book', '💡 Light'] },
+            { step: 4, title: "🖐️ Touch 4 things near you!", count: 4, items: ['👕 Clothes', '🪑 Chair', '🛋️️ Cushion', '🐾 Blanket'] },
+            { step: 3, title: "👂 Listen for 3 quiet SOUNDS!", count: 3, items: ['💨 Wind', '🐦 Birds', '🫁 Breathing'] },
+            { step: 2, title: "👃 Notice 2 SMELLS in the air!", count: 2, items: ['🧼 Soap', '🍎 Fresh Air'] },
+            { step: 1, title: "💖 Say 1 GOOD THING about yourself!", count: 1, items: ['⭐ I am brave!'] }
+        ];
+
+        let currentGroundingStep = 0;
+        let itemsFound = 0;
+
+        function loadGroundingStep(stepIndex) {
+            currentGroundingStep = stepIndex;
+            itemsFound = 0;
+            const data = groundingData[stepIndex];
+
+            for(let i=1; i<=5; i++) {
+                const pill = document.getElementById(`g-step-${i}`);
+                if(i === data.step) {
+                    pill.className = "g-step-pill flex-1 py-2 rounded-xl text-xs sm:text-sm font-bold bg-emerald-500 text-white shadow-sm text-center cursor-pointer";
+                } else {
+                    pill.className = "g-step-pill flex-1 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white text-slate-500 text-center cursor-pointer";
+                }
+            }
+
+            document.getElementById('groundingPromptHeader').innerText = data.title;
+            document.getElementById('groundingProgressText').innerText = `0 of ${data.count} noticed`;
+
+            const grid = document.getElementById('groundingItemGrid');
+            grid.innerHTML = '';
+
+            data.items.forEach((itemText) => {
+                const btn = document.createElement('button');
+                btn.className = "px-4 py-3 bg-white rounded-2xl border-2 border-emerald-200 text-emerald-800 font-bold text-sm shadow-sm hover:bg-emerald-100 transition bouncy-hover flex items-center gap-2";
+                btn.innerHTML = `<span>${itemText}</span> <i class="far fa-circle text-emerald-300"></i>`;
+                btn.onclick = () => {
+                    if(!btn.classList.contains('bg-emerald-200')) {
+                        btn.classList.remove('bg-white');
+                        btn.classList.add('bg-emerald-200', 'border-emerald-400');
+                        btn.querySelector('i').className = "fas fa-check-circle text-emerald-600";
+                        playPopSound();
+                        itemsFound++;
+                        document.getElementById('groundingProgressText').innerText = `${itemsFound} of ${data.count} noticed`;
+
+                        if(itemsFound === data.count) {
+                            setTimeout(() => {
+                                if(currentGroundingStep < 4) {
+                                    loadGroundingStep(currentGroundingStep + 1);
+                                } else {
+                                    addStar();
+                                }
+                            }, 500);
+                        }
+                    }
+                };
+                grid.appendChild(btn);
+            });
+        }
+
+        /* TOOL 3: Worry Monster Logic */
+        let monsterMode = 'type';
+        let monsterCanvas, monsterCtx, isDrawingWorry = false;
+
+        function setMonsterMode(mode) {
+            monsterMode = mode;
+            document.getElementById('btn-m-type').className = mode === 'type' ? 'px-3 py-1.5 rounded-xl text-xs font-bold bg-purple-500 text-white shadow-sm' : 'px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200';
+            document.getElementById('btn-m-draw').className = mode === 'draw' ? 'px-3 py-1.5 rounded-xl text-xs font-bold bg-purple-500 text-white shadow-sm' : 'px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200';
+
+            if(mode === 'type') {
+                document.getElementById('worryTypeContainer').classList.remove('hidden');
+                document.getElementById('worryDrawContainer').classList.add('hidden');
+            } else {
+                document.getElementById('worryTypeContainer').classList.add('hidden');
+                document.getElementById('worryDrawContainer').classList.remove('hidden');
+                initMonsterCanvas();
+            }
+        }
+
+        function initMonsterCanvas() {
+            monsterCanvas = document.getElementById('worryCanvas');
+            if(!monsterCanvas) return;
+            monsterCtx = monsterCanvas.getContext('2d');
+            monsterCtx.lineWidth = 4;
+            monsterCtx.lineCap = 'round';
+            monsterCtx.strokeStyle = '#6b21a8';
+
+            const startDrawing = (e) => {
+                isDrawingWorry = true;
+                monsterCtx.beginPath();
+                const rect = monsterCanvas.getBoundingClientRect();
+                const x = (e.clientX || e.touches[0].clientX) - rect.left;
+                const y = (e.clientY || e.touches[0].clientY) - rect.top;
+                monsterCtx.moveTo(x, y);
+            };
+
+            const draw = (e) => {
+                if(!isDrawingWorry) return;
+                const rect = monsterCanvas.getBoundingClientRect();
+                const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+                const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+                monsterCtx.lineTo(x, y);
+                monsterCtx.stroke();
+            };
+
+            const stopDrawing = () => { isDrawingWorry = false; };
+
+            monsterCanvas.onmousedown = startDrawing;
+            monsterCanvas.onmousemove = draw;
+            monsterCanvas.onmouseup = stopDrawing;
+            monsterCanvas.ontouchstart = startDrawing;
+            monsterCanvas.ontouchmove = draw;
+            monsterCanvas.ontouchend = stopDrawing;
+        }
+
+        function clearMonsterCanvas() {
+            if(monsterCtx && monsterCanvas) {
+                monsterCtx.clearRect(0, 0, monsterCanvas.width, monsterCanvas.height);
+            }
+        }
+
+        function feedMonster() {
+            const avatar = document.getElementById('monsterAvatar');
+            playTone(200, 'sawtooth', 0.3);
+
+            avatar.classList.add('scale-125', 'rotate-12');
+            setTimeout(() => avatar.classList.remove('rotate-12'), 150);
+
+            setTimeout(() => {
+                avatar.classList.remove('scale-125');
+                document.getElementById('worryText').value = '';
+                clearMonsterCanvas();
+                document.getElementById('monsterFedMessage').classList.remove('hidden');
+                addStar();
+
+                setTimeout(() => {
+                    document.getElementById('monsterFedMessage').classList.add('hidden');
+                }, 4000);
+            }, 600);
+        }
+
+        function feedMonsterAnimation() {
+            playTone(350, 'sine', 0.1);
+        }
+
+        /* TOOL 4: Pop-It Fidget Toy Logic */
+        let poppedCount = 0;
+        function initPopit() {
+            const grid = document.getElementById('popitGrid');
+            grid.innerHTML = '';
+            poppedCount = 0;
+            document.getElementById('poppedCounter').innerText = `Popped: 0 / 36`;
+
+            const colors = ['bg-pink-400', 'bg-purple-400', 'bg-indigo-400', 'bg-sky-400', 'bg-teal-400', 'bg-amber-400'];
+
+            for (let i = 0; i < 36; i++) {
+                const colorClass = colors[Math.floor(i / 6)];
+                const bubble = document.createElement('div');
+                bubble.className = `w-10 h-10 sm:w-12 sm:h-12 rounded-full ${colorClass} shadow-md flex items-center justify-center cursor-pointer transition-transform active:scale-90 border-2 border-white/40 bouncy-hover`;
+                
+                bubble.onclick = () => {
+                    if (!bubble.classList.contains('opacity-40')) {
+                        bubble.classList.add('opacity-40', 'scale-90', 'shadow-inner');
+                        playPopSound();
+                        poppedCount++;
+                        document.getElementById('poppedCounter').innerText = `Popped: ${poppedCount} / 36`;
+
+                        if (poppedCount === 36) {
+                            addStar();
+                        }
+                    }
+                };
+                grid.appendChild(bubble);
+            }
+        }
+
+        function resetPopit() {
+            initPopit();
+        }
+
+        /* TOOL 5: Affirmations Cards Logic & Speech Synthesis */
+        const affirmations = [
+            { text: "I am safe and everything is okay right now.", emoji: "🛡️" },
+            { text: "It's okay to feel big feelings. They will pass like clouds.", emoji: "☁️" },
+            { text: "I am super brave, strong, and capable!", emoji: "🦁" },
+            { text: "My thoughts and feelings matter.", emoji: "💖" },
+            { text: "I can take deep breaths whenever I need calm.", emoji: "🌊" },
+            { text: "I am loved and cared for by people around me.", emoji: "🤗" }
+        ];
+
+        let currentCardIndex = 0;
+        let isFlipped = false;
+
+        function flipAffirmationCard() {
+            const card = document.getElementById('affirmationFlipCard');
+            card.classList.toggle('flipped');
+            isFlipped = !isFlipped;
+            playTone(600, 'sine', 0.15);
+        }
+
+        function nextAffirmationCard() {
+            const card = document.getElementById('affirmationFlipCard');
+            card.classList.remove('flipped');
+            isFlipped = false;
+
+            setTimeout(() => {
+                currentCardIndex = (currentCardIndex + 1) % affirmations.length;
+                document.getElementById('cardText').innerText = `"${affirmations[currentCardIndex].text}"`;
+                document.getElementById('cardEmoji').innerText = affirmations[currentCardIndex].emoji;
+            }, 300);
+        }
+
+        function speakAffirmation() {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(affirmations[currentCardIndex].text);
+                utterance.rate = 0.9;
+                utterance.pitch = 1.1;
+                window.speechSynthesis.speak(utterance);
+            } else {
+                playTone(440, 'sine', 0.2);
+            }
+        }
+
+        /* TOOL 6: Mindful Glitter Jar Canvas */
+        let canvas, ctx;
+        let particles = [];
+
+        function initGlitterCanvas() {
+            canvas = document.getElementById('glitterCanvas');
+            ctx = canvas.getContext('2d');
+            resizeGlitterCanvas();
+
+            for(let i=0; i<80; i++) {
+                particles.push(createGlitterParticle());
+            }
+
+            canvas.addEventListener('mousemove', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                addGlitterBurst(e.clientX - rect.left, e.clientY - rect.top);
+            });
+
+            canvas.addEventListener('touchmove', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const touch = e.touches[0];
+                addGlitterBurst(touch.clientX - rect.left, touch.clientY - rect.top);
+            });
+
+            requestAnimationFrame(animateGlitter);
+        }
+
+        function resizeGlitterCanvas() {
+            if (!canvas) return;
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+
+        function createGlitterParticle(x, y) {
+            return {
+                x: x || Math.random() * (canvas ? canvas.width : 300),
+                y: y || Math.random() * (canvas ? canvas.height : 200),
+                radius: Math.random() * 4 + 2,
+                color: `hsla(${Math.random() * 360}, 90%, 75%, ${Math.random() * 0.8 + 0.2})`,
+                vx: (Math.random() - 0.5) * 1.5,
+                vy: Math.random() * 1 + 0.5,
+                alpha: Math.random()
+            };
+        }
+
+        function addGlitterBurst(x, y) {
+            playTone(800 + Math.random()*400, 'sine', 0.05, 0.03);
+            for(let i=0; i<3; i++) {
+                particles.push(createGlitterParticle(x, y));
+            }
+            if(particles.length > 150) particles.splice(0, 3);
+        }
+
+        function shakeGlitterJar() {
+            playTone(300, 'triangle', 0.4);
+            particles.forEach(p => {
+                p.vx = (Math.random() - 0.5) * 8;
+                p.vy = (Math.random() - 0.5) * 8;
+            });
+            addStar();
+        }
+
+        function animateGlitter() {
+            if(!ctx || !canvas) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            particles.forEach((p) => {
+                p.x += p.vx;
+                p.y += p.vy;
+
+                p.vy += 0.02;
+
+                if(p.x < 0 || p.x > canvas.width) p.vx *= -0.8;
+                if(p.y > canvas.height) {
+                    p.y = canvas.height;
+                    p.vy *= -0.4;
+                }
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = p.color;
+                ctx.fill();
+            });
+
+            requestAnimationFrame(animateGlitter);
+        }
+
+        /* App Initialization */
+        window.onload = function () {
+            switchTab('breathing');
+            loadGroundingStep(0);
+            initPopit();
+            initGlitterCanvas();
+            window.addEventListener('resize', resizeGlitterCanvas);
+        };
+    </script>
+</body>
+</html>
